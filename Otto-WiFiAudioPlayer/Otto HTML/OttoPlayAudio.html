@@ -8,39 +8,41 @@ h2 {
 	font-size:20px;
 }
 h1.titled-green, .jsn-bootstrap3 h1.titled-green{
-  color:#2D969D;
-  font-family:'TypSansMono Medium';
-  font-size:16px;
-  line-height:20px;
-  text-transform:uppercase;
-  background-color:transparent;
-  margin-left:5%;
-  padding:0px
-  
+	color:#2D969D;
+	font-family:'TypSansMono Medium';
+	font-size:16px;
+	line-height:20px;
+	text-transform:uppercase;
+	background-color:transparent;
+	margin-left:5%;
+	padding:0px
+
 }
 .titled-green{
-  color:#2D969D;
-  font-family:'TypSansMono Medium';
-  font-size:16px;
-  text-transform:uppercase
+	color:#2D969D;
+	font-family:'TypSansMono Medium';
+	font-size:16px;
+	text-transform:uppercase
   }
   
 .titled-white{
-  color:#fff;
-  font-family:'TypSansMono Medium';
-  font-size:16px;
-  text-transform:uppercase
+	color:#fff;
+	font-family:'TypSansMono Medium';
+	font-size:16px;
+	text-transform:uppercase
 }
 
 a{
-  color:#2D969D;
-  font-family:'TypSansMono Medium';
-  text-decoration: none;
+	color:#2D969D;
+	font-family:'TypSansMono Medium';
+	text-decoration: none;
 }
 span.message{
 	margin-left:25%;
 }
-
+span.address{
+	margin-left:5%;
+}
 img{
 	margin-left:5%;
 }
@@ -50,6 +52,72 @@ button{
 img{
   width:150px;
 }
+/*
+***********
+Slider
+***********
+*/
+input::-webkit-slider-thumb{
+	-webkit-appearance:none; 
+	-moz-apperance:none; 
+	width:30px; 
+	height:30px;
+	-webkit-border-radius:30px; 
+	-moz-border-radius:30px; 
+	-ms-border-radius:30px; 
+	-o-border-radius:30px; 
+	border-radius:30px;
+	background: #2D969D;
+}
+input[type="range"]{
+	outline: none;
+	width:100%;
+	height: 20px;
+	-webkit-appearance:none; 
+	-moz-apperance:none; 
+	-webkit-border-radius:10px; 
+	-moz-border-radius:10px; 
+	-ms-border-radius:10px; 
+	-o-border-radius:10px;
+	background-color: #CCC;
+}
+output{
+	color:#2D969D;
+	font-family:'TypSansMono Medium';
+}
+input.[type="text"]{
+	size: 3;
+}
+output.[type="text"]{
+	size: 3;
+	margin-left:10px;
+}
+span.volume {
+	font-family:'TyponineSans Regular';
+	font-size:16px;
+	font-weight:bolder;
+	color: #2D969D;
+	margin: 0px;
+	text-align: left;
+}
+table{
+	margin-left:5%; 
+	margin-right:auto;
+}
+td{
+	text-align:left;
+}
+
+td.slider{
+	width:85%;
+}
+td.value{
+	width:20px;
+}
+tr.volume{
+	height:40px;
+	margin-left:0px;
+}
 </style>
 
 <meta http-equiv="Access-Control-Allow-Origin" content="*">
@@ -57,58 +125,109 @@ img{
 <meta http-equiv="Cache-control" content="no-cache" />
 <meta name="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="-1" />
-<meta name="viewport" content="initial-scale=1.0, width=device-width" />
-<link rel="stylesheet" type="text/css" href="braccio.css">	
+<meta name="viewport" content="initial-scale=1, width=device-width" />
 <link href="favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+<script src="jquery.min.js"></script>
 <script>
-/*
-window.addEventListener('load', function(){ // on page load
-	document.body.addEventListener('touchstart', function(e){
-        console.log(e.type);
-		ajax('play');
-    }, false)
-	
-	//document.body.addEventListener('touchend', function(e){
-	//	console.log(e.type);
-        //ajax('pause');
-    //}, false)
-	
-	document.body.addEventListener('mousedown', function(e){
-		console.log(e.type);
-        ajax('play');
-    }, false)
-
-	//document.body.addEventListener('mouseup', function(e){
-	//	console.log(e.type);
-        //ajax('pause');
-    //}, false)
-}, false)
+/**
+A setup function for ajax commands
 */
-function ajax(command){
-	console.log(command); //log the command
+function setup(){
+	$.ajaxSetup({
+		crossDomain : true,
+		dataType: "jsonp", 
+		//xhrFields: { withCredentials: true},
+		type: 'GET'
+	});
 	
-	url="http://192.168.240.1:8080/arduino/" + command+"/";  //the command for the ESP8266
-	xmlhttp=new XMLHttpRequest();
-	xmlhttp.onreadystatechange=function(){
-	    if (xmlhttp.readyState==4 && xmlhttp.status==200)            
-		console.log("Resp:" + xmlhttp.responseText);  //print the response from the board          
-	};
-	xmlhttp.open("GET", url, true);    
-	xmlhttp.send();
+	//bind the address to the URL
+	arduino_address = $("#arduino_address").val();
+	var host="http://" + arduino_address + "/arduino/";
+	
+	return host;
+}
+//arduino_address defualt address
+var arduino_address="linino.local";
+$("#arduino_address").val(arduino_address);
+
+	
+/*Run on page loaded*/
+$(document).ready(function() {
+//Desktop event
+	$('.command').mousedown(function(){
+            var id= $(this).attr('id');
+	    var command=id+'/';
+	    sendCommand(command);
+        });
+
+	$('.volumeValue').mousemove(function(){
+            var value = $(this).val();
+            var id = $(this).attr('id');
+            $('#'+id+'-output').text(value);
+        });
+
+	$('.volumeValue').mouseup(function(){
+            var id= $(this).attr('id');
+	    var command=id+'/' + this.value;
+	    sendCommand(command);
+        });
+
+	//Touch event
+	$('.command').bind('touch', function(e){
+            var id= $(this).attr('id');
+	    var command=id+'/';
+	    sendCommand(command);
+        });
+
+	$('.volumeValue').bind('touchmove',function(e){
+	    var value = $(this).val();
+            var id = $(this).attr('id');
+            $('#'+id+'-output').text(value);
+	});
+
+	$('.volumeValue').bind('touchend',function(e){
+	    var id= $(this).attr('id');
+	    var command=id+'/' + this.value;
+	    sendCommand(command);
+	});
+/*
+	$('.volumeValue').click(function(){
+            var command= $(this).attr('id');	    
+	    sendCommand(command);
+        });
+*/
+});
+/*
+Javascript function to send REST commands to your Arduino Board.
+*/
+function sendCommand(command) {	
+	console.log(command); //log the command		
+	var host=setup();
+	$.get(host + command, function(data){
+		console.log("Resp:" + data);  //print the response from the board          
+	});
+	
 }
 </script>
 <title>STAR Otto &bull; Audio Player</title>
 </head>
 <body>
 <h1 class='titled-green'>STAR Otto &bull; Audio Player</h2>
-<img id="marchio" class="marchio" src="imgpsh_fullsize.jpg">
-<!--<h2 class='message hiddenoniframe'>To play the sound on your Arduino STAR Otto press and hold the button, release to stop the sound</h2>
---><!--<button class=play onmousedown="ajax('play');" onmouseup="ajax('pause');"><img alt="PLAY" src=play.png /></button>-->
-<button id=play name=play class=play onmousedown="ajax('play');" ontouchstart="ajax('play');" ><img alt="PLAY" src=play.png /></button>
-<button id=pause name=pause class=pause onmousedown="ajax('pause');" ontouchstart="ajax('pause');" ><img alt="PAUSE" src=pause.png /></button>
-<button id=stop name=stop class=stop onmousedown="ajax('stop');" ontouchstart="ajax('stop');" ><img alt="STOP" src=stop.png /></button>
+<span class='address titled-green'>Arduino Board Address:<input title="Set here the address of your board if linino.local doesn't work on your network" id=arduino_address size=15 type=text value="192.168.240.1:8080"  /></span>
+<br/>
 
-<!--<button class=button onclick="ajax('ledon');" onmouseup="ajax('ledoff');"><img alt="PLAY" src=play.png /></button>-->
+<img id="marchio" class="marchio" src="imgpsh_fullsize.jpg">
+<button id=play name=play class=command><img alt="PLAY" src=play.png /></button>
+<button id=pause name=pause class=command><img alt="PAUSE" src=pause.png /></button>
+<button id=stop name=stop class=command><img alt="STOP" src=stop.png /></button>
+
+<table>
+	<tr class=volume>		
+	<td ><span class="volume">VOLUME</span></td>
+	<td class=slider><input class="volumeValue" id="volume" type="range" min="0" max="99" value=50></td>
+	<td class=value><output type=text id="volume-output">50</output></td>
+	</tr>
+</table>
 
 </body>
 </html>
