@@ -1,0 +1,114 @@
+<html>
+<head>
+<style>
+h2 {
+	font-family:'TypSansMono Medium';
+	color: #2D969D;
+	margin: 30px;
+	font-size:20px;
+}
+h1.titled-green, .jsn-bootstrap3 h1.titled-green{
+  color:#2D969D;
+  font-family:'TypSansMono Medium';
+  font-size:16px;
+  line-height:20px;
+  text-transform:uppercase;
+  background-color:transparent;
+  margin-left:5%;
+  padding:0px
+  
+}
+.titled-green{
+  color:#2D969D;
+  font-family:'TypSansMono Medium';
+  font-size:16px;
+  text-transform:uppercase
+  }
+  
+.titled-white{
+  color:#fff;
+  font-family:'TypSansMono Medium';
+  font-size:16px;
+  text-transform:uppercase
+}
+
+a{
+  color:#2D969D;
+  font-family:'TypSansMono Medium';
+  text-decoration: none;
+}
+span.message{
+	margin-left:25%;
+}
+
+img{
+	margin-left:5%;
+}
+button{
+	margin-left:0%;
+}
+img{
+  width:150px;
+}
+</style>
+
+<meta http-equiv="Access-Control-Allow-Origin" content="*">
+<meta charset="UTF-8"> 
+<meta http-equiv="Cache-control" content="no-cache" />
+<meta name="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="-1" />
+<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+<link rel="stylesheet" type="text/css" href="braccio.css">	
+<link href="favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+<script>
+/*
+window.addEventListener('load', function(){ // on page load
+	document.body.addEventListener('touchstart', function(e){
+        console.log(e.type);
+		ajax('play');
+    }, false)
+	
+	//document.body.addEventListener('touchend', function(e){
+	//	console.log(e.type);
+        //ajax('pause');
+    //}, false)
+	
+	document.body.addEventListener('mousedown', function(e){
+		console.log(e.type);
+        ajax('play');
+    }, false)
+
+	//document.body.addEventListener('mouseup', function(e){
+	//	console.log(e.type);
+        //ajax('pause');
+    //}, false)
+}, false)
+*/
+function ajax(command){
+	console.log(command); //log the command
+	
+	url="http://192.168.240.1:8080/arduino/" + command+"/";  //the command for the ESP8266
+	xmlhttp=new XMLHttpRequest();
+	xmlhttp.onreadystatechange=function(){
+	    if (xmlhttp.readyState==4 && xmlhttp.status==200)            
+		console.log("Resp:" + xmlhttp.responseText);  //print the response from the board          
+	};
+	xmlhttp.open("GET", url, true);    
+	xmlhttp.send();
+}
+</script>
+<title>STAR Otto &bull; Audio Player</title>
+</head>
+<body>
+<h1 class='titled-green'>STAR Otto &bull; Audio Player</h2>
+<img id="marchio" class="marchio" src="imgpsh_fullsize.jpg">
+<!--<h2 class='message hiddenoniframe'>To play the sound on your Arduino STAR Otto press and hold the button, release to stop the sound</h2>
+--><!--<button class=play onmousedown="ajax('play');" onmouseup="ajax('pause');"><img alt="PLAY" src=play.png /></button>-->
+<button id=play name=play class=play onmousedown="ajax('play');" ontouchstart="ajax('play');" ><img alt="PLAY" src=play.png /></button>
+<button id=pause name=pause class=pause onmousedown="ajax('pause');" ontouchstart="ajax('pause');" ><img alt="PAUSE" src=pause.png /></button>
+<button id=stop name=stop class=stop onmousedown="ajax('stop');" ontouchstart="ajax('stop');" ><img alt="STOP" src=stop.png /></button>
+
+<!--<button class=button onclick="ajax('ledon');" onmouseup="ajax('ledoff');"><img alt="PLAY" src=play.png /></button>-->
+
+</body>
+</html>
