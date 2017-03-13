@@ -186,8 +186,10 @@ $(document).ready(function() {
 	});
 
 	$('.volumeValue').bind('touchend',function(e){
+	    var value = $(this).val();
 	    var id= $(this).attr('id');
 	    var command=id+'/' + this.value;
+            $('#'+id+'-output').text(value);
 	    sendCommand(command);
 	});
 /*
